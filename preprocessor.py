@@ -11,7 +11,7 @@ class Preprocessor:
         self.list_url = list_url
         self.tail_str = ".srt"
         self.tail_wav = ".wav"
-        self.data = []
+        self.data = [['url', 'start_time', 'end_time', 'labels']]
 
     def get_labels(self, dir_name: str):
         dir_name_split = dir_name.split("_")
