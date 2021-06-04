@@ -91,7 +91,7 @@ class Model:
         print('-----------------------------------------------Train------------------------------------------------')
         for label in self.train_data.keys():
             trainData = self.train_data[label]
-            # trainData = np.vstack(trainData)
+            trainData = np.vstack(trainData)
             # param = set(trainData.ravel())
             model = hmm.GMMHMM(n_components=self.states_num)
             # length = np.zeros([len(trainData), ], dtype=int)
@@ -105,7 +105,7 @@ class Model:
         for label in self.test_data.keys():
             feature = self.test_data[label]
             # for feat in feature:
-            #     # feat = np.vstack(feat)
+            feature = np.vstack(feature)
             for model_label in self.hmm_models.keys():
                 model = self.hmm_models[model_label]
                 if len(feature) > 4:

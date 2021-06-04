@@ -22,6 +22,7 @@ def get_list_dir():
 def extract_mfcc(url_name):
     wave, sr = librosa.load(url_name)
     mfcc = librosa.feature.mfcc(wave, n_mfcc=1)
-    if len(mfcc[0]) < 142:
-        return None
-    return mfcc[0][0:max_features - 1]
+    return mfcc
+    # if len(mfcc[0]) < 142:
+    #     return None
+    # return mfcc[0][0:max_features - 1]
