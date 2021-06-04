@@ -44,6 +44,7 @@ class Model:
                                   [0, 0, 0, 0.5, 0.5], [0, 0, 0, 0, 1]], dtype=float)
         self.start_probPrior = np.array([0.5, 0.5, 0, 0, 0], dtype=float)
         self.score_cnt = 0
+        self.err = 0
         self.score_list = {}
 
     def create_train_data(self):
@@ -87,29 +88,37 @@ class Model:
                 self.test_data[label_name] = exist_feature
 
     def train_model(self):
+        print('-----------------------------------------------Train------------------------------------------------')
         for label in self.train_data.keys():
-            model = hmm.GMMHMM(n_components=self.states_num, n_mix=self.mix_num, transmat_prior=self.tran_max,
-                               startprob_prior=self.start_probPrior,
-                               covariance_type='diag', n_iter=10)
             trainData = self.train_data[label]
-            length = np.zeros([len(trainData), ], dtype=int)
-            for m in range(len(trainData)):
-                length[m] = trainData[m].shape[0]
-            trainData = np.vstack(trainData)
+            # trainData = np.vstack(trainData)
+            # param = set(trainData.ravel())
+            model = hmm.GMMHMM(n_components=self.states_num)
+            # length = np.zeros([len(trainData), ], dtype=int)
+            # for m in range(len(trainData)):
+            #     length[m] = trainData[m].shape[0]
             model.fit(trainData)
             self.hmm_models[label] = model
 
     def score(self):
+        print('-----------------------------------------------Predict------------------------------------------------')
         for label in self.test_data.keys():
             feature = self.test_data[label]
+            # for feat in feature:
+            #     # feat = np.vstack(feat)
             for model_label in self.hmm_models.keys():
                 model = self.hmm_models[model_label]
-                score = model.score(np.vstack(feature))
+                if len(feature) > 4:
+                    score = model.score(feature[0:4])
+                else:
+                    score = model.score(feature[0:-1])
                 self.score_list[model_label] = score
             predict = max(self.score_list, key=self.score_list.get)
             print("Test on true label ", label, ": predict result label is ", predict)
             if predict == label:
                 self.score_cnt += 1
+            else:
+                self.err += 1
 
 
 if __name__ == "__main__":
@@ -118,4 +127,4 @@ if __name__ == "__main__":
     model.create_test_data()
     model.train_model()
     model.score()
-    print(model.score_cnt)
+    print(f'{model.score_cnt} vs {model.err}')
