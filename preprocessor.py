@@ -3,6 +3,7 @@ import csv
 import pysrt
 import os
 from utils import save_url, get_list_dir
+from datetime import timedelta, datetime, date
 
 
 class Preprocessor:
@@ -40,21 +41,35 @@ class Preprocessor:
             for children_url in children_list_url:
                 subs = pysrt.open(children_url)
                 i = 0
+                start_time_parent = datetime.combine(date.today(), subs[i].start.to_time())
+                end_time_parent = datetime.combine(date.today(), subs[-1].end.to_time())
+                new_end_time: datetime
+                # while True:
+                #     times = [children_url]
+                #     start_time = subs[i].start.to_time()
+                #     times.append(start_time)
+                #     if i + 10 >= len(subs):
+                #         end_time = subs[-1].end.to_time()
+                #         times.append(end_time)
+                #     else:
+                #         end_time = subs[i + 10].end.to_time()
+                #         times.append(end_time)
+                #     times.append(label)
+                #     self.data.append(times)
+                #     i = i + 10
+                #     if i >= len(subs):
+                #         break
                 while True:
                     times = [children_url]
-                    start_time = subs[i].start.to_time()
-                    times.append(start_time)
-                    if i + 10 >= len(subs):
-                        end_time = subs[-1].end.to_time()
-                        times.append(end_time)
-                    else:
-                        end_time = subs[i + 10].end.to_time()
-                        times.append(end_time)
-                    times.append(label)
-                    self.data.append(times)
-                    i = i + 10
-                    if i >= len(subs):
+                    new_end_time = start_time_parent + timedelta(seconds=5)
+
+                    if new_end_time > end_time_parent:
                         break
+                    times.append(start_time_parent.time())
+                    times.append(new_end_time.time())
+                    times.append(label)
+                    start_time_parent = new_end_time
+                    self.data.append(times)
         self.save_to_csv(save_url)
 
     def save_to_csv(self, url):
